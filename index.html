@@ -333,7 +333,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
   if(!window.supabase||!cfg.url||cfg.url.indexOf('DITT-PROJEKT')>-1){$('boot').textContent='Appen är inte kopplad till någon databas än. Fyll i config.js.';return}
   var sb=window.supabase.createClient(cfg.url,cfg.key);
   var GLOBAL='00000000-0000-0000-0000-000000000001';
-  var LG={PL:'Premier League',CH:'Championship'};
+  var LG={PL:'Premier League',CH:'Championship',BL:'Bundesliga',LL:'La Liga',SA:'Serie A',L1:'Ligue 1',ED:'Eredivisie'};
   var DAY={Mån:'Måndag',Tis:'Tisdag',Ons:'Onsdag',Tor:'Torsdag',Fre:'Fredag',Lör:'Lördag',Sön:'Söndag'};
   var SIGNS=['1','X','2'];
   var session=null,me=null,isAdmin=false,weeks=[],W=null,profiles={},allPicks=[],board=[],live={},comps=[],C=null,pending=null;
