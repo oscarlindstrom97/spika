@@ -132,6 +132,27 @@ dialog#manage::backdrop{background:rgba(31,27,22,.5)}
 .tbq{margin-top:20px;padding:18px;border:1px solid var(--line);border-radius:var(--r);display:grid;gap:10px}
 .tbq label{font:600 15px var(--head);color:var(--ink)}
 .tbq input{max-width:140px}
+.tip{display:inline-grid;place-items:center;width:32px;height:32px;margin:-6px 0 -6px 2px;border:0;border-radius:50%;background:transparent;color:var(--muted);cursor:pointer;vertical-align:middle}
+.tip .ico{width:18px;height:18px}
+.tip[aria-expanded="true"]{color:var(--accent)}
+.tipbox{position:absolute;z-index:60;max-width:280px;padding:12px 14px;border-radius:var(--r);background:var(--ink);color:var(--bg);font-size:14px;line-height:1.5;box-shadow:0 12px 30px -12px rgba(20,16,12,.45)}
+.lastwin{margin:14px 0 0;color:var(--on-band);font-size:16px}
+.lastwin span{opacity:.82}
+.lastwin b{font-weight:600}
+.hof{list-style:none;margin:8px 0 0;padding:0}
+.hof li{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--line)}
+.hof .wk{color:var(--muted);font-size:14px}
+.hof .nm{color:var(--ink);font-weight:600;overflow-wrap:anywhere}
+.hof .pt{font-variant-numeric:tabular-nums;color:var(--muted)}
+.mx{width:auto;min-width:100%}
+.mx th,.mx td{padding:9px 7px;text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
+.mx th.c{color:var(--muted);font-weight:600}
+.mx td.name{text-align:left;padding-right:16px;color:var(--ink)}
+.mx td.ok{background:color-mix(in srgb,var(--good) 24%,transparent);color:var(--ink);font-weight:600}
+.mx td.no{color:var(--muted);text-decoration:line-through}
+.mx td.lv{opacity:.72}
+.mx td.sp{box-shadow:inset 0 -3px 0 var(--accent)}
+.mx td.tot{font-weight:600;color:var(--ink)}
 .sideh{font:600 15px var(--head);color:var(--ink);margin:24px 0 6px}
 .top3{list-style:none;margin:0;padding:0}
 .top3 li{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}
@@ -350,6 +371,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
   <div id="app" hidden>
     <div class="band">
     <h1>Vem tippar <em>rätt?</em></h1>
+    <p class="lastwin" id="lastwin" hidden></p>
     <div class="strip" role="group" aria-label="Veckan i korthet">
       <div class="cell"><span class="k">Omgång</span><span class="v" id="s-week">–</span><small id="s-week2"></small></div>
       <div class="cell"><span class="k">Spelstopp</span><div id="clock" role="timer" aria-live="off"></div></div>
@@ -375,9 +397,9 @@ details.set[open] summary .ico{transform:rotate(180deg)}
         <label>Beskrivning (valfritt)<textarea class="plain" id="cdesc" maxlength="500" placeholder="Till exempel: Insats 50 kr, vinnaren tar potten. Avgörs efter vecka 52."></textarea></label>
         <p class="cap">Gäller per rad. En halvgardering är två tecken på en match, en helgardering är 1, X och 2. Den bästa raden räknas.</p>
         <fieldset class="extras"><legend>Extra regler (valfritt)</legend>
-          <label class="chk"><input type="checkbox" id="cspik">Veckans spik<small>Varje rad markerar en match som spik. Den får bara ha ett tecken och ger dubbla poäng om den sitter.</small></label>
-          <label class="chk"><input type="checkbox" id="ctb">Utslagsfråga<small>Alla gissar antal mål i veckans match. Vid lika poäng vinner den som är närmast.</small></label>
-          <label class="chk"><input type="checkbox" id="cmax">Max möjliga poäng<small>Under helgen visar topplistan hur många poäng var och en som mest kan nå.</small></label>
+          <label class="chk"><input type="checkbox" id="cspik"><span>Veckans spik<button type="button" class="tip" data-tip="Varje rad väljer en match som spik. Spiken får bara ha ett tecken. Sitter den får du dubbla poäng för matchen, alltså ett extra poäng." aria-label="Förklaring: Veckans spik" aria-expanded="false"></button></span></label>
+          <label class="chk"><input type="checkbox" id="ctb"><span>Utslagsfråga<button type="button" class="tip" data-tip="Alla gissar hur många mål det blir totalt i veckans match. Om två har lika många poäng vinner den som gissat närmast." aria-label="Förklaring: Utslagsfråga" aria-expanded="false"></button></span></label>
+          <label class="chk"><input type="checkbox" id="cmax"><span>Max möjliga poäng<button type="button" class="tip" data-tip="Under helgen visar topplistan hur många poäng var och en som mest kan nå, om resten av matcherna går deras väg." aria-label="Förklaring: Max möjliga poäng" aria-expanded="false"></button></span></label>
         </fieldset>
         <div class="inline" style="margin:0"><button class="btn" id="mkcomp" type="button">Skapa tävling</button><span class="status" id="mkmsg" role="status"></span></div>
       </div>
@@ -407,8 +429,11 @@ details.set[open] summary .ico{transform:rotate(180deg)}
       <p class="empty" id="boardempty" hidden>Ingen har lämnat in någon rad än.</p>
       <h3 class="sw" id="histh" hidden>Poäng per vecka</h3>
       <div class="scroll" tabindex="0" role="region" aria-label="Poäng per vecka" style="margin-top:12px"><table id="hist" hidden><thead></thead><tbody></tbody></table></div>
+      <h3 class="sw" id="hofh" hidden>Veckovinnare</h3>
+      <ol class="hof" id="hof" hidden></ol>
       <h3 class="sw" id="allh" hidden>Allas rader den här veckan</h3>
-      <div class="scroll" tabindex="0" role="region" aria-label="Allas rader" style="margin-top:12px"><table id="all" hidden><tbody></tbody></table></div>
+      <p class="cap" id="allcap" hidden style="margin-top:4px">Grönt är rätt, överstruket är fel. En understruken ruta är spiken.</p>
+      <div class="scroll" tabindex="0" role="region" aria-label="Allas rader" style="margin-top:12px"><table id="all" class="mx" hidden><thead></thead><tbody></tbody></table></div>
     </section>
 
     <details class="set" id="setbox">
@@ -417,6 +442,9 @@ details.set[open] summary .ico{transform:rotate(180deg)}
         <p class="cap">Namn i topplistan</p>
         <div class="inline"><input id="nick" maxlength="30" aria-label="Namn i topplistan"><button class="btn ghost" id="savenick" type="button">Spara</button></div>
         <p class="status" id="nickmsg" role="status" style="margin-top:12px"></p>
+        <h3 class="manage-h" style="margin-top:40px">Dina uppgifter</h3>
+        <p class="desc" style="margin-top:6px">Helspik sparar ditt namn, din e-postadress, dina rader och vilka tävlingar du är med i. Namnet och dina rader syns för de andra i samma tävling, raderna först efter deadline. E-postadressen visas inte för andra spelare, men den som sköter Helspik kan se den i databasen. Uppgifterna lagras hos Supabase i Stockholm och delas inte med någon annan. Webbläsaren sparar bara din inloggning och om du valt ljust eller mörkt läge. Du kan radera ditt konto när du vill. Då försvinner allt, även tävlingar du har skapat.</p>
+        <div class="inline"><button class="btn small danger" id="delacc" type="button">Radera mitt konto</button><span class="status" id="delmsg" role="status"></span></div>
         <div id="admin" class="adm" hidden style="margin-top:56px">
           <h2>Admin</h2>
           <p class="cap" style="margin:20px 0 4px">Facit för veckan. Fylls i automatiskt när liveresultat är kopplat.</p>
@@ -480,6 +508,22 @@ details.set[open] summary .ico{transform:rotate(180deg)}
       clearTimeout(t);armed=false;btn.textContent=orig;fn();
     };
   }
+  var tipOpen=null;
+  function closeTip(){if(tipOpen){tipOpen.box.remove();tipOpen.btn.setAttribute('aria-expanded','false');tipOpen.btn.removeAttribute('aria-describedby');tipOpen=null}}
+  function tipBtn(text,label){var b=el('button',null,'tip');b.type='button';b.dataset.tip=text;b.setAttribute('aria-label','Förklaring: '+label);b.setAttribute('aria-expanded','false');return b}
+  function fillTips(root){(root||document).querySelectorAll('.tip:empty').forEach(function(b){b.append(icon('M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18z M12 8h.01 M11 12h1v5h1'))})}
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('.tip');
+    if(b){e.preventDefault();e.stopPropagation();
+      if(tipOpen&&tipOpen.btn===b){closeTip();return}
+      closeTip();var host=b.closest('dialog')||document.body,box=el('div',b.dataset.tip,'tipbox');box.id='tipbox';box.setAttribute('role','tooltip');host.append(box);
+      var r=b.getBoundingClientRect(),hr=host===document.body?{left:-window.scrollX,top:-window.scrollY}:host.getBoundingClientRect(),sl=host===document.body?0:host.scrollLeft,st=host===document.body?0:host.scrollTop;
+      var maxL=(host===document.body?document.documentElement.clientWidth:host.clientWidth)-box.offsetWidth-12;
+      box.style.left=Math.max(12,Math.min(r.left-hr.left+sl-8,maxL))+'px';box.style.top=(r.bottom-hr.top+st+6)+'px';
+      b.setAttribute('aria-expanded','true');b.setAttribute('aria-describedby','tipbox');tipOpen={btn:b,box:box};return}
+    if(tipOpen&&!(e.target.closest&&e.target.closest('.tipbox')))closeTip();
+  },true);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeTip()});
   function announce(t){var a=$('announce');a.textContent='';setTimeout(function(){a.textContent=t},60)}
   function icon(d){var n='http://www.w3.org/2000/svg',s=document.createElementNS(n,'svg');s.setAttribute('class','ico');s.setAttribute('viewBox','0 0 24 24');s.setAttribute('aria-hidden','true');var p=document.createElementNS(n,'path');p.setAttribute('d',d);s.appendChild(p);return s}
   var themeBtn=$('theme');
@@ -652,7 +696,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     else if(pos>-1){ws.append(document.createTextNode('Vecka '),el('b',String(pos+1)),document.createTextNode(' av '+C.weeks_count))}
     else ws.textContent=pl(C.weeks_count,'vecka','veckor');
     r.append(ws);
-    if(C.use_spik)r.append(el('span','Veckans spik'));if(C.use_tiebreak)r.append(el('span','Utslagsfråga'));if(C.show_max)r.append(el('span','Max visas'));
+    [[C.use_spik,'Veckans spik','Varje rad väljer en match som spik. Spiken får bara ha ett tecken. Sitter den får du dubbla poäng för matchen, alltså ett extra poäng.'],[C.use_tiebreak,'Utslagsfråga','Alla gissar hur många mål det blir totalt i veckans match. Om två har lika många poäng vinner den som gissat närmast.'],[C.show_max,'Max visas','Under helgen visar topplistan hur många poäng var och en som mest kan nå, om resten av matcherna går deras väg.']].forEach(function(x){if(!x[0])return;var sp=el('span',x[1]);sp.append(tipBtn(x[2],x[1]));r.append(sp)});fillTips(r);
     if(C.id!==GLOBAL){
       var cs=el('span');cs.append(document.createTextNode('Kod '),el('span',C.code,'code'));r.append(cs);
       var cp=el('button','Kopiera','link');cp.type='button';
@@ -694,8 +738,8 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     if(C.id===GLOBAL)return;
     // Extra regler
     box.append(el('p','Extra regler','manage-h'));
-    var ex=el('div',null,'extras'),opts=[['use_spik','Veckans spik'],['use_tiebreak','Utslagsfråga'],['show_max','Max möjliga poäng']],cbs={};
-    opts.forEach(function(o){var lb=el('label',null,'chk'),cb=document.createElement('input');cb.type='checkbox';cb.checked=!!C[o[0]];cbs[o[0]]=cb;lb.append(cb,document.createTextNode(o[1]));ex.append(lb)});
+    var ex=el('div',null,'extras'),opts=[['use_spik','Veckans spik','Varje rad väljer en match som spik. Spiken får bara ha ett tecken. Sitter den får du dubbla poäng för matchen, alltså ett extra poäng.'],['use_tiebreak','Utslagsfråga','Alla gissar hur många mål det blir totalt i veckans match. Om två har lika många poäng vinner den som gissat närmast.'],['show_max','Max möjliga poäng','Under helgen visar topplistan hur många poäng var och en som mest kan nå, om resten av matcherna går deras väg.']],cbs={};
+    opts.forEach(function(o){var lb=el('label',null,'chk'),cb=document.createElement('input');cb.type='checkbox';cb.checked=!!C[o[0]];cbs[o[0]]=cb;var sp=el('span',o[1]);sp.append(tipBtn(o[2],o[1]));lb.append(cb,sp);ex.append(lb)});fillTips(ex);
     var er=el('div',null,'inline'),eb=el('button','Spara regler','btn small ghost'),em=el('span',null,'status');eb.type='button';
     eb.onclick=function(){var upd={};opts.forEach(function(o){upd[o[0]]=cbs[o[0]].checked});
       sb.from('competitions').update(upd).eq('id',C.id).select().then(function(r){
@@ -976,9 +1020,25 @@ details.set[open] summary .ico{transform:rotate(180deg)}
   function rowMax(row,spik){var s=0;W.matches.forEach(function(m,i){var oc=outcome(i),fin=oc&&oc.state==='final',bonus=C.use_spik&&spik===i?1:0;
     if(fin){if(row[i]&&row[i].indexOf(oc.o)>-1)s+=1+bonus}else if(row[i])s+=1+bonus});return s}
   function fmtRow(row){return row.map(function(x){return x||'-'}).join(' ')}
+  function weekDone(w){if(!w||!w.results)return false;if(w.results.every(function(x){return x}))return true;return Date.now()>new Date(w.deadline).getTime()+3*864e5}
+  function winnersByWeek(){
+    var by={};board.forEach(function(r){(by[r.week_id]=by[r.week_id]||[]).push(r)});var out=[];
+    Object.keys(by).forEach(function(wid){var wk=weeks.find(function(w){return w.id===wid});if(!weekDone(wk))return;
+      var rs=by[wid],best=Math.max.apply(null,rs.map(function(r){return r.score})),top=rs.filter(function(r){return r.score===best});
+      if(C.use_tiebreak&&top.length>1){var bd=Math.min.apply(null,top.map(function(r){return r.tb_diff==null?999:r.tb_diff}));if(bd<999)top=top.filter(function(r){return (r.tb_diff==null?999:r.tb_diff)===bd})}
+      out.push({w:wk,score:best,ids:top.map(function(r){return r.user_id})})});
+    return out.sort(function(a,b){return new Date(b.w.deadline)-new Date(a.w.deadline)});
+  }
+  function nameList(ids){var n=ids.map(function(id){return (profiles[id]||'Kollega')+(id===me?' (du)':'')});return n.length>1?n.slice(0,-1).join(', ')+' och '+n[n.length-1]:n[0]}
+  function renderWinners(){
+    var ws=winnersByWeek(),lw=$('lastwin');lw.innerHTML='';lw.hidden=!ws.length;
+    if(ws.length){var x=ws[0];lw.append(el('span','Senaste veckovinnare i '+C.name+': '),el('b',nameList(x.ids)),el('span',' med '+pl(x.score,'poäng','poäng')+' ('+x.w.label.split('·')[0].trim().toLowerCase()+')'))}
+    var hof=$('hof');hof.innerHTML='';hof.hidden=!ws.length;$('hofh').hidden=!ws.length;
+    ws.forEach(function(x){var li=el('li');li.append(el('span',x.w.short||x.w.id,'wk'),el('span',nameList(x.ids),'nm'),el('span',pl(x.score,'poäng','poäng'),'pt'));hof.append(li)});
+  }
   function renderBoard(){
     if(!C||!W)return;
-    $('rankcomp').textContent=C.name;
+    $('rankcomp').textContent=C.name;renderWinners();
     var P=allPicks.filter(function(p){return p.competition_id===C.id});
     var wids=[],short={};board.forEach(function(r){if(wids.indexOf(r.week_id)<0){wids.push(r.week_id);short[r.week_id]=r.short}});wids.sort();
     var users={};
@@ -1025,11 +1085,30 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     var ab=$('all').tBodies[0];ab.innerHTML='';
     var others=P.filter(function(p){return p.week_id===W.id}).sort(function(a,b){return (profiles[a.user_id]||'').localeCompare(profiles[b.user_id]||'')||a.row_no-b.row_no});
     var showAll=!open()&&others.length>0;$('all').hidden=!showAll;$('allh').hidden=!showAll;
-    if(showAll)others.forEach(function(p){var tr=document.createElement('tr');if(p.user_id===me)tr.className='me';
-      tr.append(el('td',(profiles[p.user_id]||'Kollega')+(C.max_rows>1?' · rad '+p.row_no:'')+(C.use_spik&&p.spik!=null?' · spik '+(p.spik+1):'')+(C.use_tiebreak&&p.tiebreak!=null?' · '+p.tiebreak+' mål':''),'name'),el('td',fmtRow(p.picks),'n mono'));ab.append(tr)});
+    var ah=$('all').tHead;ah.innerHTML='';$('allcap').hidden=!showAll;
+    if(showAll){
+      var hr=document.createElement('tr');hr.append(el('th','Spelare'));
+      W.matches.forEach(function(m,i){var th=el('th',String(i+1),'c');th.title=m.h+' – '+m.a;th.setAttribute('aria-label','Match '+(i+1)+': '+m.h+' – '+m.a);hr.append(th)});
+      if(C.use_tiebreak)hr.append(el('th','Mål','c'));hr.append(el('th','Rätt','c'));ah.append(hr);
+      others.forEach(function(p){var tr=document.createElement('tr');if(p.user_id===me)tr.className='me';
+        tr.append(el('td',(profiles[p.user_id]||'Kollega')+(C.max_rows>1?' · rad '+p.row_no:''),'name'));
+        W.matches.forEach(function(m,i){var v=p.picks[i]||'–',oc=outcome(i),cls='c',hit=oc&&v.indexOf(oc.o)>-1;
+          if(oc)cls+=(hit?' ok':' no')+(oc.state==='live'?' lv':'');if(C.use_spik&&p.spik===i)cls+=' sp';
+          var td=el('td',v,cls);td.setAttribute('aria-label','Match '+(i+1)+': '+v+(oc?(hit?', rätt':', fel')+(oc.state==='live'?' just nu':''):'')+(C.use_spik&&p.spik===i?', spik':''));tr.append(td)});
+        if(C.use_tiebreak)tr.append(el('td',p.tiebreak!=null?String(p.tiebreak):'–','c'));
+        tr.append(el('td',String(rowScore(p.picks,p.spik)),'c tot'));ab.append(tr)});
+    }
   }
 
   /* ---------- namn ---------- */
+  sure($('delacc'),'Säker? Allt raderas för alltid',function(){
+    say('delmsg','Raderar…');
+    sb.rpc('delete_my_account').then(function(r){
+      if(r.error){say('delmsg','Kunde inte radera kontot: '+r.error.message,'err');return}
+      announce('Ditt konto är raderat.');sb.auth.signOut();
+    });
+  });
+  fillTips();
   $('savenick').onclick=function(){
     var v=$('nick').value.trim().slice(0,30);if(!v){say('nickmsg','Skriv ett namn.','err');return}
     sb.from('profiles').update({name:v}).eq('id',me).then(function(r){
