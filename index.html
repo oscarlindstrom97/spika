@@ -264,6 +264,20 @@ details.set[open] summary .ico{transform:rotate(180deg)}
 @media (max-width:420px){.opts{gap:6px}.folk .p{gap:6px}.go{padding:14px 20px}}
 @media (max-width:420px){.hdr .me span{display:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* Hover: 50 % blått på knappar och rutor, 50 % rött på radera */
+.opt,.chip,.btn,.go,.xbtn,.tbtn,.seg button{transition:background-color .18s var(--out),color .18s var(--out),border-color .18s var(--out)}
+@media (hover:hover){
+  .opt:not(:disabled):not([aria-pressed="true"]):hover,
+  .chip:not([aria-pressed="true"]):hover,
+  .btn.ghost:not(.danger):not(:disabled):hover,
+  .go.done:not(:disabled):hover,
+  .xbtn:hover,
+  .seg button:not([aria-pressed="true"]):hover{background:color-mix(in srgb,var(--accent) 50%,transparent);border-color:var(--accent);color:var(--text)}
+  .btn:not(.ghost):not(.danger):not(:disabled):hover,
+  .go:not(.done):not(:disabled):hover{background:color-mix(in srgb,var(--accent) 82%,var(--bg))}
+  .btn.danger:not(:disabled):hover{background:color-mix(in srgb,var(--bad) 50%,transparent);border-color:var(--bad);color:var(--text)}
+  .top .tbtn:hover{background:color-mix(in srgb,var(--on-band) 22%,transparent);border-color:var(--on-band)}
+}
 </style>
 </head>
 <body>
