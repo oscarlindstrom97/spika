@@ -89,6 +89,9 @@ section{margin-top:48px}
 .strip small{display:block;margin-top:4px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
 @media (max-width:720px){.strip{grid-template-columns:1fr 1fr}.strip .cell:nth-child(3){border-left:0}.strip .cell:nth-child(n+3){border-top:1px solid var(--line)}.strip .v{font-size:20px}.strip .cell{padding:14px 16px}}
 .top .link{color:var(--on-band)}
+.profbtn{display:inline-flex;align-items:center;gap:8px;max-width:42vw;min-height:44px;padding:0 10px;border:1px solid var(--band-line);border-radius:var(--r);background:transparent;color:var(--on-band);font:500 14px var(--body);cursor:pointer}
+.profbtn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.profbtn .ico{width:18px;height:18px;flex:none}
 .top .tbtn{color:var(--on-band);border-color:var(--band-line)}
 .top .tbtn:hover{border-color:var(--on-band)}
 .top :focus-visible{outline-color:var(--on-band)}
@@ -112,8 +115,9 @@ section{margin-top:48px}
 .bar3 .s2{background:var(--ink);color:var(--bg)}
 .desc{margin:14px 0 0;max-width:62ch;white-space:pre-line;overflow-wrap:anywhere;color:var(--text);font-size:15px;line-height:1.6}
 textarea.plain{font:400 16px/1.5 var(--body);min-height:96px}
-dialog#manage{width:min(560px,calc(100% - 32px));max-height:86vh;overflow:auto;border:1px solid var(--line);border-radius:var(--r);padding:28px;background:var(--bg);color:var(--text);box-shadow:0 24px 64px -20px rgba(20,16,12,.45)}
-dialog#manage::backdrop{background:rgba(31,27,22,.5)}
+dialog#manage,dialog#profile{width:min(560px,calc(100% - 32px));max-height:86vh;overflow:auto;border:1px solid var(--line);border-radius:var(--r);padding:28px;background:var(--bg);color:var(--text);box-shadow:0 24px 64px -20px rgba(20,16,12,.45)}
+dialog#profile{width:min(680px,calc(100% - 32px))}
+dialog#manage::backdrop,dialog#profile::backdrop{background:rgba(31,27,22,.5)}
 .mhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:4px}
 .mhead h2{font-size:22px}
 .xbtn{width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:var(--r);background:transparent;color:var(--ink);cursor:pointer}
@@ -322,7 +326,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
   <div class="wrap">
     <a class="mark" href="./" aria-label="Helspik, till startsidan"><svg class="logo" viewBox="8 10 471 136" role="img" aria-label="Helspik" xmlns="http://www.w3.org/2000/svg"><g fill="currentColor" transform="translate(9.573 113.815) scale(0.067427 -0.067427)"><path d="M399 587C399 751 484 824 606 824C729 824 800 749 800 607V0H1094V661C1094 928 949 1078 724 1078C575 1078 470 1013 399 897V1490H104V0H399Z" transform="translate(0.000 0)"/><path d="M586 -24C842 -24 1046 122 1085 332H816C789 250 710 197 595 197C440 197 350 298 345 454H1096V533C1096 855 887 1080 576 1080C273 1080 58 849 58 527C58 206 266 -24 586 -24ZM347 642C363 774 450 856 582 856C715 856 803 774 818 642Z" transform="translate(1139.000 0)"/><path d="M399 1490H104V0H399Z" transform="translate(2229.000 0)"/><path d="M543 -26C819 -26 1011 112 1011 323C1011 478 913 570 700 612L500 651C419 668 372 703 372 757C372 820 433 869 534 869C638 869 710 806 712 721H985C979 941 799 1078 526 1078C251 1078 78 946 78 746C78 582 187 478 392 438L577 402C663 385 714 352 714 296C714 231 647 185 538 185C423 185 355 240 344 332H54C72 105 269 -26 543 -26Z" transform="translate(2672.000 0)"/><path d="M104 -418H399V158H402C463 39 570 -22 709 -22C985 -22 1166 198 1166 529C1166 853 981 1078 711 1078C574 1078 463 1023 398 913H395V1056H104ZM633 218C484 218 385 340 385 529C385 717 484 840 633 840C776 840 869 727 869 529C869 331 776 218 633 218Z" transform="translate(3677.000 0)"/><path d="M104 0H399V1056H104ZM251 1189C348 1189 419 1256 419 1346C419 1436 348 1503 251 1503C154 1503 83 1436 83 1346C83 1256 154 1189 251 1189Z" transform="translate(4841.000 0)"/><path d="M104 0H399V335L484 429L795 0H1140L705 598L1118 1056H772L402 652H399V1490H104Z" transform="translate(5284.000 0)"/></g><rect x="452.72" y="91" width="23" height="23" fill="currentColor"/></svg></a>
     <div class="hdr">
-      <div class="me" id="who" hidden><span id="whoname"></span><button class="link" id="out" type="button">Logga ut</button></div>
+      <div class="me" id="who" hidden><button class="profbtn" id="profbtn" type="button" aria-haspopup="dialog" aria-label="Min profil"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M4 20a8 8 0 0 1 16 0"/></svg><span id="whoname"></span></button><button class="link" id="out" type="button">Logga ut</button></div>
       <button class="tbtn" id="theme" type="button" aria-label="Byt till mörkt läge" title="Byt tema">
         <svg class="ico sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/></svg>
         <svg class="ico moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/></svg>
@@ -383,6 +387,27 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     <div class="maincol">
 
     <dialog id="manage" aria-labelledby="manageh"></dialog>
+<dialog id="profile" aria-labelledby="profh">
+  <div class="mhead"><h2 id="profh">Min profil</h2><button class="xbtn" id="profx" type="button" aria-label="Stäng"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div>
+        <p class="cap">Namn i topplistan</p>
+        <div class="inline"><input id="nick" maxlength="30" aria-label="Namn i topplistan"><button class="btn ghost" id="savenick" type="button">Spara</button></div>
+        <p class="status" id="nickmsg" role="status" style="margin-top:12px"></p>
+        <h3 class="manage-h" style="margin-top:40px">Dina uppgifter</h3>
+        <p class="desc" style="margin-top:6px">Helspik sparar ditt namn, din e-postadress, dina rader och vilka tävlingar du är med i. Namnet och dina rader syns för de andra i samma tävling, raderna först efter deadline. E-postadressen visas inte för andra spelare, men den som sköter Helspik kan se den i databasen. Uppgifterna lagras hos Supabase i Stockholm och delas inte med någon annan. Webbläsaren sparar bara din inloggning och om du valt ljust eller mörkt läge. Du kan radera ditt konto när du vill. Då försvinner allt, även tävlingar du har skapat.</p>
+        <div class="inline"><button class="btn small danger" id="delacc" type="button">Radera mitt konto</button><span class="status" id="delmsg" role="status"></span></div>
+        <div id="admin" class="adm" hidden style="margin-top:56px">
+          <h2>Admin</h2>
+          <p class="cap" style="margin:20px 0 4px">Facit för veckan. Fylls i automatiskt när liveresultat är kopplat.</p>
+          <div id="admrows"></div>
+          <div class="inline"><button class="btn" id="saveres" type="button">Spara facit</button><span class="status" id="resmsg" role="status"></span></div>
+          <p class="cap" style="margin:48px 0 12px">Ny vecka. Klistra in JSON med id, label, short, deadline och matches.</p>
+          <textarea id="newweek" spellcheck="false" aria-label="Ny vecka som JSON"></textarea>
+          <div class="inline"><button class="btn" id="addweek" type="button">Lägg till vecka</button><span class="status" id="weekmsg" role="status"></span></div>
+        </div>
+      </div>
+</dialog>
+
     <div class="newcomp card" id="newcomp" hidden>
       <p class="sub-h">Skapa tävling</p>
       <div class="form" style="margin-top:16px">
@@ -436,26 +461,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
       <div class="scroll" tabindex="0" role="region" aria-label="Allas rader" style="margin-top:12px"><table id="all" class="mx" hidden><thead></thead><tbody></tbody></table></div>
     </section>
 
-    <details class="set" id="setbox">
-      <summary>Inställningar<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
-      <div style="padding-bottom:24px">
-        <p class="cap">Namn i topplistan</p>
-        <div class="inline"><input id="nick" maxlength="30" aria-label="Namn i topplistan"><button class="btn ghost" id="savenick" type="button">Spara</button></div>
-        <p class="status" id="nickmsg" role="status" style="margin-top:12px"></p>
-        <h3 class="manage-h" style="margin-top:40px">Dina uppgifter</h3>
-        <p class="desc" style="margin-top:6px">Helspik sparar ditt namn, din e-postadress, dina rader och vilka tävlingar du är med i. Namnet och dina rader syns för de andra i samma tävling, raderna först efter deadline. E-postadressen visas inte för andra spelare, men den som sköter Helspik kan se den i databasen. Uppgifterna lagras hos Supabase i Stockholm och delas inte med någon annan. Webbläsaren sparar bara din inloggning och om du valt ljust eller mörkt läge. Du kan radera ditt konto när du vill. Då försvinner allt, även tävlingar du har skapat.</p>
-        <div class="inline"><button class="btn small danger" id="delacc" type="button">Radera mitt konto</button><span class="status" id="delmsg" role="status"></span></div>
-        <div id="admin" class="adm" hidden style="margin-top:56px">
-          <h2>Admin</h2>
-          <p class="cap" style="margin:20px 0 4px">Facit för veckan. Fylls i automatiskt när liveresultat är kopplat.</p>
-          <div id="admrows"></div>
-          <div class="inline"><button class="btn" id="saveres" type="button">Spara facit</button><span class="status" id="resmsg" role="status"></span></div>
-          <p class="cap" style="margin:48px 0 12px">Ny vecka. Klistra in JSON med id, label, short, deadline och matches.</p>
-          <textarea id="newweek" spellcheck="false" aria-label="Ny vecka som JSON"></textarea>
-          <div class="inline"><button class="btn" id="addweek" type="button">Lägg till vecka</button><span class="status" id="weekmsg" role="status"></span></div>
-        </div>
-      </div>
-    </details>
+
 
     <ul class="rules">
       <li>Raden går att ändra fram till deadline. Sista versionen räknas.</li>
@@ -577,7 +583,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
       if(signup&&!r.data.session)say('authmsg','Kolla din e-post, bekräfta kontot och logga sedan in.','ok');
     });
   };
-  $('out').onclick=function(){sb.auth.signOut()};
+  $('out').onclick=function(){if($('profile').open)$('profile').close();sb.auth.signOut()};
   $('forgot').onclick=function(){$('authform').hidden=true;$('resetform').hidden=false;$('remail').value=$('email').value;say('resetmsg','');$('remail').focus()};
   $('backlogin').onclick=function(){$('resetform').hidden=true;$('authform').hidden=false};
   $('resetform').onsubmit=function(ev){
@@ -1105,9 +1111,11 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     say('delmsg','Raderar…');
     sb.rpc('delete_my_account').then(function(r){
       if(r.error){say('delmsg','Kunde inte radera kontot: '+r.error.message,'err');return}
-      announce('Ditt konto är raderat.');sb.auth.signOut();
+      announce('Ditt konto är raderat.');if($('profile').open)$('profile').close();sb.auth.signOut();
     });
   });
+  $('profbtn').onclick=function(){closeTip();try{$('profile').showModal()}catch(e){$('profile').setAttribute('open','')}};
+  $('profx').onclick=function(){$('profile').close()};
   fillTips();
   $('savenick').onclick=function(){
     var v=$('nick').value.trim().slice(0,30);if(!v){say('nickmsg','Skriv ett namn.','err');return}
