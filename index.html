@@ -186,6 +186,7 @@ th{font:500 13px var(--body);color:var(--muted);border-bottom:1px solid var(--in
 td.n,th.n{text-align:right;padding-right:0;padding-left:16px}
 td.n{font-size:19px}
 tr.first td.n{font-size:26px}
+td.n.avg,tr.first td.n.avg{font-size:17px;color:var(--muted)}
 td.n.txt,tr.first td.n.txt{font-size:15px;font-weight:500;color:var(--muted)}
 td.r{width:44px;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
 td.name{white-space:normal;overflow-wrap:anywhere;color:var(--ink)}
@@ -334,6 +335,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
           <label>Halvgarderingar<input id="chalf" type="number" min="0" max="13" value="2" inputmode="numeric"></label>
           <label>Helgarderingar<input id="cfull" type="number" min="0" max="13" value="1" inputmode="numeric"></label>
         </div>
+        <label>Antal veckor<input id="cweeks" type="number" min="1" max="52" inputmode="numeric" placeholder="Tom = tills vidare"></label>
         <label>Beskrivning (valfritt)<textarea class="plain" id="cdesc" maxlength="500" placeholder="Till exempel: Insats 50 kr, vinnaren tar potten. Avgörs efter vecka 52."></textarea></label>
         <p class="cap">Gäller per rad. En halvgardering är två tecken på en match, en helgardering är 1, X och 2. Den bästa raden räknas.</p>
         <div class="inline" style="margin:0"><button class="btn" id="mkcomp" type="button">Skapa tävling</button><span class="status" id="mkmsg" role="status"></span></div>
@@ -359,7 +361,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
       <p class="cap" id="rankcomp" style="margin-top:8px"></p>
       <p class="cap" id="rankinfo" style="margin-top:4px"></p>
       <div class="scroll" tabindex="0" role="region" aria-label="Topplista"><table id="board" hidden>
-        <thead><tr><th></th><th>Namn</th><th class="n">Veckan</th><th class="n">Säsongen</th></tr></thead><tbody></tbody></table></div>
+        <thead><tr><th></th><th>Namn</th><th class="n">Veckan</th><th class="n">Snitt</th><th class="n">Totalt</th></tr></thead><tbody></tbody></table></div>
       <p class="empty" id="boardempty" hidden>Ingen har lämnat in någon rad än.</p>
       <h3 class="sw" id="histh" hidden>Poäng per vecka</h3>
       <div class="scroll" tabindex="0" role="region" aria-label="Poäng per vecka" style="margin-top:12px"><table id="hist" hidden><thead></thead><tbody></tbody></table></div>
@@ -563,9 +565,15 @@ details.set[open] summary .ico{transform:rotate(180deg)}
       W?sb.rpc('pick_distribution',{cid:C.id,wid:W.id}):Promise.resolve({data:[]})
     ]).then(function(r){board=r[0].data||[];dist=r[1].data||[]});
   }
+  function compWeeks(c){ // veckorna som ingår i tävlingen, äldst först
+    var asc=weeks.slice().sort(function(a,b){return new Date(a.deadline)-new Date(b.deadline)});
+    var st=c.start_week?asc.findIndex(function(w){return w.id===c.start_week}):0;if(st<0)st=0;
+    return asc.slice(st,c.weeks_count?st+c.weeks_count:undefined).map(function(w){return w.id});
+  }
+  function inComp(){return !!(C&&W&&compWeeks(C).indexOf(W.id)>-1)}
   function setupRows(resetActive){
     rowsData=[];savedRows={};dirty=false;if(resetActive)activeRow=0;
-    if(!C||!W)return;
+    if(!C||!W||!inComp())return;
     for(var k=1;k<=C.max_rows;k++){
       var mine=allPicks.find(function(p){return p.user_id===me&&p.competition_id===C.id&&p.week_id===W.id&&p.row_no===k});
       rowsData.push(mine?mine.picks.slice():new Array(W.matches.length).fill(''));savedRows[k]=!!mine;
@@ -595,6 +603,11 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     var r=$('comprule');r.innerHTML='';if(!C)return;
     function part(label,n,one,many){var s=el('span');s.append(el('b',String(n)),document.createTextNode(' '+(n===1?one:many)));return s}
     r.append(part('',C.max_rows,'rad','rader'),part('',C.max_half,'halvgardering','halvgarderingar'),part('',C.max_full,'helgardering','helgarderingar'));
+    var cw=compWeeks(C),pos=W?cw.indexOf(W.id):-1,ws=el('span');
+    if(!C.weeks_count)ws.textContent='Tills vidare';
+    else if(pos>-1){ws.append(document.createTextNode('Vecka '),el('b',String(pos+1)),document.createTextNode(' av '+C.weeks_count))}
+    else ws.textContent=pl(C.weeks_count,'vecka','veckor');
+    r.append(ws);
     if(C.id!==GLOBAL){
       var cs=el('span');cs.append(document.createTextNode('Kod '),el('span',C.code,'code'));r.append(cs);
       var cp=el('button','Kopiera','link');cp.type='button';
@@ -629,6 +642,18 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     };
     dr2.append(db2,dm2);box.append(ta,dr2);
     if(C.id===GLOBAL)return;
+    // Antal veckor
+    box.append(el('p','Antal veckor','manage-h'));
+    var wr=el('div',null,'inline'),wi=document.createElement('input');wi.type='number';wi.min='1';wi.max='52';wi.value=C.weeks_count||'';wi.placeholder='Tom = tills vidare';wi.setAttribute('aria-label','Antal veckor');
+    var wb=el('button','Spara','btn small ghost'),wm=el('span',null,'status');wb.type='button';
+    wb.onclick=function(){
+      var v=wi.value.trim();if(v&&!(+v>=1&&+v<=52)){wm.className='status err';wm.setAttribute('role','alert');wm.textContent='1 till 52, eller tomt.';return}
+      sb.from('competitions').update({weeks_count:v?+v:null}).eq('id',C.id).select().then(function(r){
+        if(r.error||!r.data||!r.data.length){wm.className='status err';wm.setAttribute('role','alert');wm.textContent='Kunde inte spara.';return}
+        C.weeks_count=v?+v:null;setupRows(true);loadBoard().then(render);announce('Antal veckor är sparat.');
+      });
+    };
+    wr.append(wi,wb,wm);box.append(wr);
     // Namn
     var nr=el('div',null,'inline'),ni=document.createElement('input');ni.maxLength=40;ni.value=C.name;ni.setAttribute('aria-label','Tävlingens namn');
     var nb=el('button','Spara namn','btn small ghost');nb.type='button';var nm=el('span',null,'status');
@@ -684,15 +709,16 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     dr.append(db,dm);box.append(dr);
   }
   $('mkcomp').onclick=function(){
-    var name=$('cname').value.trim(),rows=+$('crows').value,half=+$('chalf').value,full=+$('cfull').value;
+    var name=$('cname').value.trim(),rows=+$('crows').value,half=+$('chalf').value,full=+$('cfull').value,wk=$('cweeks').value.trim();
+    if(wk&&!(+wk>=1&&+wk<=52)){say('mkmsg','Antal veckor ska vara 1 till 52, eller tomt för tills vidare.','err');return}
     if(name.length<2){say('mkmsg','Ge tävlingen ett namn.','err');return}
     if(!(rows>=1&&rows<=10)||!(half>=0&&half<=13)||!(full>=0&&full<=13)){say('mkmsg','Rader 1 till 10, garderingar 0 till 13.','err');return}
     var id=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():null;
     if(!id){say('mkmsg','Webbläsaren stöder inte att skapa tävling.','err');return}
     say('mkmsg','Skapar…');
-    sb.from('competitions').insert({id:id,name:name,max_rows:rows,max_half:half,max_full:full,description:$('cdesc').value.trim().slice(0,500)||null}).then(function(r){
+    sb.from('competitions').insert({id:id,name:name,max_rows:rows,max_half:half,max_full:full,weeks_count:wk?+wk:null,description:$('cdesc').value.trim().slice(0,500)||null}).then(function(r){
       if(r.error){say('mkmsg','Kunde inte skapa: '+r.error.message,'err');return}
-      say('mkmsg','Tävlingen är skapad. Dela koden med de som ska vara med.','ok');$('cname').value='';$('cdesc').value='';pending=id;load();
+      say('mkmsg','Tävlingen är skapad. Dela koden med de som ska vara med.','ok');$('cname').value='';$('cdesc').value='';$('cweeks').value='';pending=id;load();
     });
   };
   $('joincomp').onclick=function(){
@@ -760,7 +786,11 @@ details.set[open] summary .ico{transform:rotate(180deg)}
   }
   function renderCoupon(){
     var box=$('coupon');box.innerHTML='';var last=null;
-    if(!rowsData.length){guardLine();return}
+    if(!rowsData.length){guardLine();
+      if(C&&W&&!inComp()){var cw=compWeeks(C),first=weeks.find(function(w){return w.id===C.start_week});
+        var after=first&&new Date(W.deadline)>new Date(first.deadline);
+        box.append(el('p',after?'Tävlingen är avslutad. Den här veckan ingår inte.':'Tävlingen har inte börjat än. Den startar '+(first?first.label.split('·')[0].trim().toLowerCase():'senare')+'.','empty'))}
+      return}
     var row=rowsData[activeRow];guardLine();
     $('distnote').hidden=!dist.some(function(x){return x.rows});
     $('distnote').textContent='Procenten under varje match visar hur '+(C.id===GLOBAL?'alla':'gänget')+' har tippat.';
@@ -890,7 +920,9 @@ details.set[open] summary .ico{transform:rotate(180deg)}
       var tr=document.createElement('tr');tr.className=(scored&&i===0?'first ':'')+(r.id===me?'me':'');
       tr.append(el('td',scored?String(i+1):'','r'),el('td',(profiles[r.id]||'Kollega')+(r.id===me?' (du)':''),'name'),
         (function(){var v=anyOut||wids.indexOf(W.id)>-1?(r.cur!=null?r.cur+' / '+W.matches.length:'–'):(r.has?'Inne':'–');return el('td',v,'n'+(/\d/.test(v)?'':' txt'))})(),
-        el('td',scored?String(r.total):'–','n'));
+        (function(){var cnt=Object.keys(r.weeks).filter(function(k){return k!==W.id}).length+((anyOut||wids.indexOf(W.id)>-1)&&r.has?1:0);
+          var v=scored&&cnt?(r.total/cnt).toLocaleString('sv-SE',{minimumFractionDigits:1,maximumFractionDigits:1}):'–';return el('td',v,'n'+(/\d/.test(v)?' avg':' txt'))})(),
+        el('td',scored?String(r.total):'–','n'+(scored?'':' txt')));
       tb.append(tr);
     });
     var hist=$('hist'),show=wids.length>0&&rows.length;hist.hidden=!show;$('histh').hidden=!show;
