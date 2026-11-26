@@ -15,14 +15,14 @@
 :root{
   /* Elfenbensvit grund, varm grafit för text, sand som yta. En enda accent: skogsblå #2F4B66. */
   --bg:#FAF8F4; --ink:#4A3F36; --text:#2B2622; --muted:#675E54; --sand:#E6DFD3; --sand-soft:#EFEAE0; --greige:#8C8274; --line:#E3DCCF;
-  --accent:#2F4B66; --on-accent:#FAF8F4; --block:#2B2622; --on-block:#FAF8F4; --on-ink:#FAF8F4; --good:#5d6b4d; --bad:#9a4a3a;
+  --accent:#2F4B66; --on-accent:#FAF8F4; --band:#2F4B66; --on-band:#FAF8F4; --band-line:rgba(250,248,244,.22); --block:#2B2622; --on-block:#FAF8F4; --on-ink:#FAF8F4; --good:#5d6b4d; --bad:#9a4a3a;
   --head:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
   --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
   --r:6px; --out:cubic-bezier(.2,.7,.2,1); color-scheme:light;
 }
 html[data-theme="dark"]{
   --bg:#1c1916; --ink:#e9e2d5; --text:#efe9e0; --muted:#b3a999; --sand:#2a2622; --sand-soft:#24211d; --greige:#8f8576; --line:#35302a;
-  --accent:#8DB1D6; --on-accent:#12202d; --block:#2F4B66; --on-block:#FAF8F4; --on-ink:#1c1916; --good:#a9c29a; --bad:#e0a090; color-scheme:dark}
+  --accent:#8DB1D6; --on-accent:#12202d; --band:#1d3042; --on-band:#efe9e0; --band-line:rgba(239,233,224,.18); --block:#2F4B66; --on-block:#FAF8F4; --on-ink:#1c1916; --good:#a9c29a; --bad:#e0a090; color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.6 var(--body);-webkit-font-smoothing:antialiased;
   padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
@@ -32,15 +32,15 @@ html{scroll-padding-bottom:140px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:var(--r)}
 button{font:inherit;color:inherit}
-.wrap{max-width:680px;margin:0 auto;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
 .num,td.n,.score,.stat b,.units b{font-family:var(--body);font-weight:600;font-variant-numeric:tabular-nums}
 
 /* Topp */
-.top{padding-top:env(safe-area-inset-top,0px);border-bottom:1px solid var(--line)}
+.top{padding-top:env(safe-area-inset-top,0px);background:var(--band);color:var(--on-band)}
 .top .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
-.mark{display:flex;align-items:center;color:var(--ink);text-decoration:none}
+.mark{display:flex;align-items:center;color:var(--on-band);text-decoration:none}
 .logo{height:30px;width:auto;display:block}
-.me{display:flex;align-items:center;gap:16px;font-size:14px;color:var(--muted);min-width:0}
+.me{display:flex;align-items:center;gap:16px;font-size:14px;color:var(--on-band);min-width:0}
 .me span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:38vw}
 .tbtn{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--greige);border-radius:var(--r);background:transparent;color:var(--ink);cursor:pointer}
 .tbtn:hover{border-color:var(--accent)}
@@ -54,7 +54,7 @@ h2{font:600 24px/1.2 var(--head);letter-spacing:-.015em;color:var(--ink);margin:
 h3{font:500 15px var(--head);color:var(--muted);margin:0}
 .lede{color:var(--muted);max-width:44ch;margin:16px 0 0}
 .cap{color:var(--muted);font-size:14px;margin:0}
-section{margin-top:104px}
+section{margin-top:48px}
 
 /* Nedräkning: sandfärgad yta */
 .clock{margin-top:48px;background:var(--block);color:var(--on-block);border-radius:var(--r);padding:32px clamp(20px,5vw,40px)}
@@ -68,14 +68,76 @@ section{margin-top:104px}
 
 /* Kupong */
 .day{font:500 15px var(--head);color:var(--muted);margin:56px 0 0;padding-bottom:12px;border-bottom:1px solid var(--ink)}
-.match{display:grid;grid-template-columns:1fr auto;gap:12px 20px;align-items:center;padding:24px 0;border-bottom:1px solid var(--line)}
+#coupon{margin-top:20px;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.match{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:8px 16px;align-items:center;padding:18px 18px;border-bottom:1px solid var(--line)}
+.match:last-child{border-bottom:0}
+.match:nth-child(even){background:var(--sand-soft)}
+.nr{width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font:600 13px var(--body);font-variant-numeric:tabular-nums;align-self:start;margin-top:1px}
+.teams .title{display:block;font:600 18px/1.3 var(--head);letter-spacing:-.01em;color:var(--ink);overflow-wrap:anywhere}
+.folk{grid-column:2/-1;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;font-size:13px;color:var(--muted)}
+.folk .p{display:flex;gap:8px}
+.folk .p span{width:64px;text-align:center;font-variant-numeric:tabular-nums}
+.distnote{display:none;margin-top:12px}
+.folk .p span.hi{color:var(--ink);font-weight:600}
+.go.done:disabled{opacity:1}
+/* Veckan i korthet */
+.strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:40px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg)}
+.strip .cell{padding:18px 22px;border-left:1px solid var(--line);min-width:0}
+.strip .cell:first-child{border-left:0}
+.strip .k{display:block;font-size:13px;color:var(--muted)}
+.strip .v{display:block;margin-top:6px;font:600 24px/1.15 var(--head);letter-spacing:-.015em;color:var(--ink);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.strip small{display:block;margin-top:4px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+@media (max-width:720px){.strip{grid-template-columns:1fr 1fr}.strip .cell:nth-child(3){border-left:0}.strip .cell:nth-child(n+3){border-top:1px solid var(--line)}.strip .v{font-size:20px}.strip .cell{padding:14px 16px}}
+.top .link{color:var(--on-band)}
+.top .tbtn{color:var(--on-band);border-color:var(--band-line)}
+.top .tbtn:hover{border-color:var(--on-band)}
+.top :focus-visible{outline-color:var(--on-band)}
+/* Bandet: rubrik och veckan i korthet */
+.band{background:var(--band);color:var(--on-band);box-shadow:0 0 0 100vmax var(--band);clip-path:inset(0 -100vmax);padding:8px 0 40px}
+.band h1{color:var(--on-band);margin:36px 0 0}
+.band h1 em{font-style:normal;color:var(--on-band);opacity:.62}
+.band .strip{margin-top:28px;border:1px solid var(--band-line);background:transparent}
+.band .strip .cell{border-color:var(--band-line)!important}
+.band .k,.band small{color:var(--on-band);opacity:.78}
+.band .v{color:var(--on-band)}
+.band .live-tag{color:var(--on-band)}.band .dot{background:var(--on-band)}
+/* Kupongens rubrik med tävlingsväljare */
+.chead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px}
+.chead .comps{margin-top:0}
+.lg{display:inline-block;font:600 11px var(--body);letter-spacing:.05em;padding:3px 8px;border-radius:4px;background:var(--sand);color:var(--ink);margin-right:8px;vertical-align:1px}
+.bar3{display:flex;width:208px;height:24px;border-radius:4px;overflow:hidden;font:600 12px var(--body);font-variant-numeric:tabular-nums}
+.bar3 span{display:flex;align-items:center;justify-content:center;min-width:44px;padding:0 8px;white-space:nowrap}
+.bar3 .s1{background:var(--accent);color:var(--on-accent)}
+.bar3 .sx{background:var(--sand);color:var(--ink)}
+.bar3 .s2{background:var(--ink);color:var(--bg)}
+.sideh{font:600 15px var(--head);color:var(--ink);margin:24px 0 6px}
+.top3{list-style:none;margin:0;padding:0}
+.top3 li{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}
+.top3 .r{color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+.top3 .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
+.top3 .p{font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink)}
+/* Två spalter på dator: kupong till vänster, översikt till höger */
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:48px;align-items:start}
+.side{display:none;position:sticky;top:24px;margin-top:32px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);padding:20px}
+.side h2{font-size:18px}
+.ov{list-style:none;margin:14px 0 0;padding:0}
+.ov li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
+.ov .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
+.ov .s{display:flex;gap:4px}
+.ov .s span{width:22px;height:22px;display:grid;place-items:center;border-radius:4px;font:600 12px var(--body);color:var(--muted)}
+.ov .s span.on{background:var(--accent);color:var(--on-accent)}
+.side .sum{display:flex;justify-content:space-between;gap:12px;margin:14px 0;font-size:13px;color:var(--muted)}
+.side .sum b{color:var(--ink);font-weight:600}
+.side .go{width:100%;justify-content:center}
+.side .status{margin-top:10px}
+@media (min-width:980px){.layout{grid-template-columns:minmax(0,1fr) 340px}.side{display:block}.dock{display:none!important}body{padding-bottom:48px}}
 .teams{min-width:0}
 .teams .h,.teams .a{display:block;font:500 19px/1.3 var(--head);letter-spacing:-.01em;overflow-wrap:anywhere;color:var(--ink)}
 .teams .a{color:var(--muted)}
 .teams .w{display:block;margin-top:8px;font-size:13px;color:var(--muted)}
 .teams .w em{font-style:normal;color:var(--bad)}
 .opts{display:flex;gap:8px}
-.opt{width:48px;height:48px;border-radius:var(--r);border:1px solid var(--greige);background:transparent;color:var(--ink);font:600 16px var(--body);cursor:pointer;
+.opt{width:64px;height:40px;font-size:18px!important;border-radius:var(--r);border:1px solid var(--greige);background:transparent;color:var(--ink);font:600 16px var(--body);cursor:pointer;
   transition:background-color .18s var(--out),color .18s var(--out),border-color .18s var(--out)}
 .opt:hover:not(:disabled){border-color:var(--accent)}
 .opt[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
@@ -134,7 +196,7 @@ td.mono{letter-spacing:.18em}
 .empty{color:var(--muted);margin:24px 0 0}
 
 /* Tävlingar */
-.comps{display:flex;flex-wrap:wrap;gap:8px;margin-top:56px}
+.comps{display:flex;flex-wrap:wrap;gap:8px;margin-top:32px}
 .chip{min-height:44px;border:1px solid var(--greige);background:transparent;color:var(--ink);border-radius:var(--r);padding:10px 16px;font:500 14px var(--head);cursor:pointer;transition:background-color .18s var(--out),color .18s var(--out)}
 .chip:hover{border-color:var(--accent)}
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
@@ -187,7 +249,8 @@ details.set[open] summary .ico{transform:rotate(180deg)}
 .adm .r2{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--line)}
 .adm .opt{width:44px;height:44px;font-size:14px}
 .rules{margin:72px 0 0;padding:0;list-style:none;color:var(--muted);font-size:14px;display:grid;gap:8px;border-top:1px solid var(--line);padding-top:24px}
-@media (max-width:420px){.opt{width:44px;height:44px}.opts{gap:6px}.go{padding:14px 20px}}
+@media (max-width:560px){.match{grid-template-columns:28px minmax(0,1fr)}.match .opts{grid-column:2/-1}.opt{width:56px;height:44px}.folk .p span{width:56px}.bar3{width:180px}.folk{grid-template-columns:auto minmax(0,1fr)}.folk .p{order:-1}.folk>span:first-child{display:none}.distnote{display:block}}
+@media (max-width:420px){.opts{gap:6px}.folk .p{gap:6px}.go{padding:14px 20px}}
 @media (max-width:420px){.me span{display:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -245,12 +308,18 @@ details.set[open] summary .ico{transform:rotate(180deg)}
   </div>
 
   <div id="app" hidden>
-    <h1>Vem tippar rätt?</h1>
-    <p class="lede">Tippa tretton matcher varje helg. Flest rätt vinner.</p>
-    <div class="clock" id="clock" role="timer" aria-live="off"></div>
+    <div class="band">
+    <h1>Vem tippar <em>rätt?</em></h1>
+    <div class="strip" role="group" aria-label="Veckan i korthet">
+      <div class="cell"><span class="k">Omgång</span><span class="v" id="s-week">–</span><small id="s-week2"></small></div>
+      <div class="cell"><span class="k">Spelstopp</span><div id="clock" role="timer" aria-live="off"></div></div>
+      <div class="cell"><span class="k">Spelare</span><span class="v" id="s-players">–</span><small id="s-players2"></small></div>
+      <div class="cell"><span class="k">Din rad</span><span class="v" id="s-mine">–</span><small id="s-mine2"></small></div>
+    </div>
+    </div>
+    <div class="layout">
+    <div class="maincol">
 
-    <div class="comps" id="comps" role="group" aria-label="Tävlingar"></div>
-    <div class="rule" id="comprule"></div>
     <div class="newcomp card" id="manage" hidden></div>
     <div class="newcomp card" id="newcomp" hidden>
       <p class="sub-h">Skapa tävling</p>
@@ -270,10 +339,12 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     </div>
 
     <section aria-labelledby="kupong">
-      <h2 id="kupong">Din rad</h2>
-      <p class="cap" id="weeklabel" style="margin-top:8px"></p>
+      <div class="chead"><h2 id="kupong">Kupong</h2><div class="comps" id="comps" role="group" aria-label="Tävlingar"></div></div>
+      <div class="rule" id="comprule"></div>
+      <p class="cap" id="weeklabel" hidden></p>
       <div class="rows" id="rowtabs" role="group" aria-label="Rader"></div>
       <p class="guard" id="guard" role="status"></p>
+      <p class="cap distnote" id="distnote" hidden>Procenten under varje match visar hur alla har tippat.</p>
       <div id="coupon"></div>
     </section>
 
@@ -313,6 +384,17 @@ details.set[open] summary .ico{transform:rotate(180deg)}
       <li>Andras rader syns först när deadline har gått.</li>
       <li>Ett poäng per rätt tecken efter full tid. Uppskjuten match räknas bort.</li>
     </ul>
+    </div>
+    <aside class="side" id="side" aria-labelledby="ovh">
+      <h2 id="ovh">Översikt</h2>
+      <ol class="ov" id="ov"></ol>
+      <p class="sum"><span id="ovguard"></span><span id="ovfill"></span></p>
+      <button class="go" id="save2" type="button" disabled><span id="savetxt2">Lämna in</span></button>
+      <p class="status" id="ovmsg" role="status"></p>
+      <h3 class="sideh">Topplistan</h3>
+      <ol class="top3" id="top3"></ol>
+    </aside>
+    </div>
   </div>
 </main>
 
@@ -337,7 +419,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
   var DAY={Mån:'Måndag',Tis:'Tisdag',Ons:'Onsdag',Tor:'Torsdag',Fre:'Fredag',Lör:'Lördag',Sön:'Söndag'};
   var SIGNS=['1','X','2'];
   var session=null,me=null,isAdmin=false,weeks=[],W=null,profiles={},allPicks=[],board=[],live={},comps=[],C=null,pending=null;
-  var membersAll=[],manageOpen=false,recovering=false,rowsData=[],activeRow=0,savedRows={},dirty=false,signup=false,tick=null,wasOpen=null,units=null,clockKey='',channel=null,poll=null,guardTimer=null;
+  var dist=[],membersAll=[],manageOpen=false,recovering=false,rowsData=[],activeRow=0,savedRows={},dirty=false,signup=false,tick=null,wasOpen=null,units=null,clockKey='',channel=null,poll=null,guardTimer=null;
   function el(tag,txt,cls){var e=document.createElement(tag);if(txt!=null)e.textContent=txt;if(cls)e.className=cls;return e}
   function open(){return W&&Date.now()<new Date(W.deadline).getTime()}
   function say(id,txt,cls){var e=$(id);e.className='status'+(cls?' '+cls:'');e.setAttribute('role',cls==='err'?'alert':'status');e.textContent=txt}
@@ -359,6 +441,8 @@ details.set[open] summary .ico{transform:rotate(180deg)}
   }
   themeBtn.onclick=function(){applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark')};
   applyTheme(document.documentElement.dataset.theme==='dark'?'dark':'light');
+  function cap1(t){return t.charAt(0).toUpperCase()+t.slice(1)}
+  function pad(n){return String(n).padStart(2,'0')}
   function pl(n,one,many){return n+' '+(n===1?one:many)}
 
   /* ---------- liveställning ---------- */
@@ -468,7 +552,10 @@ details.set[open] summary .ico{transform:rotate(180deg)}
   }
   function loadBoard(){
     if(!C)return Promise.resolve();
-    return sb.rpc('leaderboard',{cid:C.id}).then(function(r){board=r.data||[]});
+    return Promise.all([
+      sb.rpc('leaderboard',{cid:C.id}),
+      W?sb.rpc('pick_distribution',{cid:C.id,wid:W.id}):Promise.resolve({data:[]})
+    ]).then(function(r){board=r[0].data||[];dist=r[1].data||[]});
   }
   function setupRows(resetActive){
     rowsData=[];savedRows={};dirty=false;if(resetActive)activeRow=0;
@@ -484,7 +571,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     renderComps();
     if(!W||!C){$('clock').className='clock';$('clock').textContent='Ingen vecka är upplagd än.';$('coupon').innerHTML='';$('dock').classList.add('gone');return}
     $('weeklabel').textContent=W.label;
-    renderClock();renderRowTabs();renderCoupon();renderBoard();renderAdmin();
+    renderStrip();renderClock();renderRowTabs();renderCoupon();renderBoard();renderAdmin();
     clearInterval(tick);tick=setInterval(renderClock,1000);
   }
 
@@ -597,28 +684,23 @@ details.set[open] summary .ico{transform:rotate(180deg)}
   /* ---------- nedräkning ---------- */
   function renderClock(){
     var c=$('clock'),dl=new Date(W.deadline),o=open();
-    if(!o){
-      var n=playingCount(),key='closed'+n;
-      if(key!==clockKey){clockKey=key;units=null;c.innerHTML='';
-        c.append(el('p','Deadline var '+dl.toLocaleString('sv-SE',{weekday:'long',day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}),'cap'));
-        c.append(el('div','Raderna är låsta.','locked'));
-        if(n){var t=el('p',null,'live-tag');t.style.marginTop='16px';t.append(el('span',null,'dot'),document.createTextNode(pl(n,'match pågår','matcher pågår')+' just nu'));c.append(t)}
-      }
-    }else{
-      if(!units||clockKey!=='open'){
-        clockKey='open';c.innerHTML='';
-        c.append(el('p','Stänger '+dl.toLocaleString('sv-SE',{weekday:'long',day:'numeric',month:'long'})+' kl. '+dl.toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'}),'cap'));
-        var g=el('div',null,'units');units={};
-        [['d','dagar'],['h','timmar'],['m','minuter'],['s','sekunder']].forEach(function(u){
-          var w=el('div'),b=el('b','00');w.append(b,el('small',u[1]));g.append(w);units[u[0]]=b});
-        c.append(g);
-      }
-      var s=Math.max(0,Math.floor((dl-Date.now())/1000)),p=function(n){return String(n).padStart(2,'0')};
-      units.d.textContent=p(Math.floor(s/86400));units.h.textContent=p(Math.floor(s%86400/3600));units.m.textContent=p(Math.floor(s%3600/60));units.s.textContent=p(s%60);
-    }
+    var day=cap1(dl.toLocaleDateString('sv-SE',{weekday:'short'}).replace('.','')),t=dl.toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'});
+    var key=o?'open':'closed'+playingCount();
+    if(key!==clockKey||!units){clockKey=key;c.innerHTML='';units={v:el('span',o?day+' '+t:'Låst','v'),s:el('small','')};c.append(units.v,units.s);
+      if(!o){var n=playingCount();if(n){var tg=el('span',null,'live-tag');tg.append(el('span',null,'dot'),document.createTextNode(pl(n,'match pågår','matcher pågår')));units.s.append(tg)}else units.s.textContent='Stängde '+day.toLowerCase()+' '+t}}
+    if(o){var s2=Math.max(0,Math.floor((dl-Date.now())/1000)),d=Math.floor(s2/86400);
+      units.s.textContent=(d?d+' d ':'')+pad(Math.floor(s2%86400/3600))+':'+pad(Math.floor(s2%3600/60))+':'+pad(s2%60)+' kvar'}
     $('dock').classList.toggle('gone',!o);
     if(wasOpen!==null&&wasOpen!==o){wasOpen=o;load();return}
     wasOpen=o;
+  }
+  function renderStrip(){
+    if(!W||!C)return;
+    var parts=W.label.split('·').map(function(x){return x.trim()});
+    $('s-week').textContent=parts[0]||W.label;$('s-week2').textContent=parts[1]||'';
+    var n=membersAll.filter(function(m){return m.competition_id===C.id}).length;
+    var inne={};allPicks.forEach(function(p){if(p.competition_id===C.id&&p.week_id===W.id)inne[p.user_id]=1});
+    $('s-players').textContent=String(n);$('s-players2').textContent=open()?'i '+C.name:Object.keys(inne).length+' lämnade in';
   }
 
   /* ---------- kupong ---------- */
@@ -658,10 +740,12 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     var box=$('coupon');box.innerHTML='';var last=null;
     if(!rowsData.length){guardLine();return}
     var row=rowsData[activeRow];guardLine();
+    $('distnote').hidden=!dist.some(function(x){return x.rows});
+    $('distnote').textContent='Procenten under varje match visar hur '+(C.id===GLOBAL?'alla':'gänget')+' har tippat.';
     W.matches.forEach(function(m,i){
-      if(m.d!==last){last=m.d;var k=m.d.split(' ');box.append(el('h3',(DAY[k[0]]||k[0])+' '+k.slice(1).join(' '),'day'))}
       var mr=el('div',null,'match'),tm=el('div',null,'teams');
-      tm.append(el('span',m.h,'h'),el('span',m.a,'a'));
+      mr.append(el('span',String(i+1),'nr'));
+      tm.append(el('span',m.h+' – '+m.a,'title'));
       var oc=!open()?outcome(i):null,l=liveRow(i);
       if(!open()&&l&&l.home!=null&&statusText(l)){
         var sc=el('div',null,'score'+(PLAYING[l.status]?' on':''));
@@ -674,7 +758,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
         rs.append(icon(hit?'M5 12.5l4.5 4.5L19 7.5':'M6 6l12 12M18 6L6 18'),document.createTextNode((oc.state==='live'?'Just nu ':'')+(hit?'rätt':'fel')));
         tm.append(rs);
       }
-      var w=el('span',LG[m.lg]+(m.t?' · '+m.t:''),'w');if(!m.t)w.append(el('em',' · tid ej bekräftad'));tm.append(w);
+      var w=el('span',null,'w');w.append(el('span',m.lg,'lg'),document.createTextNode(m.d.split(' ')[0]+(m.t?' '+m.t:'')+' · '+(LG[m.lg]||m.lg)));if(!m.t)w.append(el('em',' · tid ej bekräftad'));tm.append(w);
       var o=el('div',null,'opts');o.setAttribute('role','group');o.setAttribute('aria-label','Match '+(i+1)+': '+m.h+' mot '+m.a);
       SIGNS.forEach(function(v){
         var on=row[i].indexOf(v)>-1;
@@ -689,7 +773,17 @@ details.set[open] summary .ico{transform:rotate(180deg)}
         b.onclick=function(){toggle(i,v)};
         o.append(b);
       });
-      mr.append(tm,o);box.append(mr);
+      mr.append(tm,o);
+      var dd=dist.find(function(x){return x.i===i});
+      if(dd&&dd.rows){
+        var tot=dd.n1+dd.nx+dd.n2||1,vals=[dd.n1,dd.nx,dd.n2],mx=Math.max.apply(null,vals);
+        var fk=el('div',null,'folk'),pp=el('div',null,'p bar3');
+        fk.append(el('span',C.id===GLOBAL?'Så tippar alla':'Så tippar gänget'));
+        ['s1','sx','s2'].forEach(function(c,k){var pc=Math.round(vals[k]/tot*100),sg=el('span',pc+'%',c);sg.style.flex=String(Math.max(pc,1));pp.append(sg)});
+        pp.setAttribute('aria-label','1: '+Math.round(vals[0]/tot*100)+' procent, X: '+Math.round(vals[1]/tot*100)+' procent, 2: '+Math.round(vals[2]/tot*100)+' procent');
+        fk.append(pp);mr.append(fk);
+      }
+      box.append(mr);
     });
     updateSave();
   }
@@ -700,11 +794,25 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     var anyOver=rowsData.some(function(r){return overLimit(r)});
     b.disabled=!open()||done===0||!dirty||anyOver;b.classList.toggle('done',!dirty&&saved>0);$('savetxt').textContent=(!dirty&&saved>0)?'Inlämnad':'Lämna in';
     $('prog').style.width=(t?n/t*100:0)+'%';
+    var b2=$('save2');b2.disabled=b.disabled;$('savetxt2').textContent=$('savetxt').textContent;b2.classList.toggle('done',b.classList.contains('done'));
+    $('s-mine').textContent=n+' / '+t;$('s-mine2').textContent=(!dirty&&saved>0)?'Inlämnad':(open()?(complete(row)?'Klar att lämna in':'Inte klar'):'Ingen rad');
+    var c3=counts(row);$('ovguard').textContent='Hel: '+c3.f+' · Halv: '+c3.h;$('ovfill').textContent=n+' av '+t+' tippade';
+    renderOverview();
     var s=$('stat');s.className='stat';
     var rowName=rowsData.length>1?'Rad '+(activeRow+1)+': ':'';
     if(complete(row))$('stat1').textContent=rowName+'klar';else $('stat1').textContent=rowName+n+' av '+t;
     $('stat2').textContent=rowsData.length>1?(!dirty&&saved>0?pl(saved,'rad är sparad','rader är sparade'):pl(done,'rad','rader')+' klara att lämna in'):(complete(row)?(!dirty&&saved>0?'Din rad är sparad. Du kan ändra fram till deadline.':'Lämna in när du är nöjd.'):'matcher tippade');
   }
+  function renderOverview(){
+    var ol=$('ov');ol.innerHTML='';if(!W||!rowsData.length)return;var row=rowsData[activeRow];
+    W.matches.forEach(function(m,i){
+      var li=el('li'),sg=el('span',null,'s');
+      li.append(el('span',(i+1)+'. '+m.h+' – '+m.a,'t'));
+      SIGNS.forEach(function(v){sg.append(el('span',v,row[i].indexOf(v)>-1?'on':''))});
+      li.append(sg);ol.append(li);
+    });
+  }
+  $('save2').onclick=function(){$('save').click()};
   $('save').onclick=function(){
     var b=$('save'),jobs=[],bad=[];
     rowsData.forEach(function(row,k){
@@ -725,7 +833,8 @@ details.set[open] summary .ico{transform:rotate(180deg)}
       if(err){var s=$('stat');s.className='stat err';announce('Kunde inte spara raden.');$('stat1').textContent='Kunde inte spara';$('stat2').textContent=open()?err.error.message:'Deadline har gått.';b.disabled=!open();return}
       allPicks=allPicks.filter(function(p){return !(p.user_id===me&&p.competition_id===C.id&&p.week_id===W.id)});
       jobs.forEach(function(j){if(j.del)savedRows[j.no]=false;else{savedRows[j.no]=true;allPicks.push({user_id:me,week_id:W.id,competition_id:C.id,row_no:j.no,picks:j.row.slice()})}});
-      dirty=false;updateSave();renderBoard();announce('Din rad är sparad.');
+      dirty=false;updateSave();renderBoard();renderStrip();announce('Din rad är sparad.');
+      sb.rpc('pick_distribution',{cid:C.id,wid:W.id}).then(function(r){dist=r.data||[];renderCoupon()});
     });
   };
 
@@ -748,6 +857,9 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     var rows=Object.keys(users).map(function(k){var u=users[k];u.total=u.base+(u.cur||0);return u})
       .sort(function(a,b){return (b.total-a.total)||((b.cur||0)-(a.cur||0))});
     var scored=wids.length>0||anyOut,n=playingCount();
+    var t3=$('top3');t3.innerHTML='';
+    if(!rows.length)t3.append(el('li','Ingen har lämnat in än.'));
+    rows.slice(0,3).forEach(function(r,k){var li=el('li');li.append(el('span',scored?String(k+1):'–','r'),el('span',(profiles[r.id]||'Kollega')+(r.id===me?' (du)':''),'n'),el('span',scored?String(r.total)+' p':(r.has?'Inne':'–'),'p'));t3.append(li)});
     var info=$('rankinfo');info.innerHTML='';
     if(n){var t=el('span',null,'live-tag');t.append(el('span',null,'dot'),document.createTextNode('Live. Ställningen uppdateras automatiskt.'));info.append(t)}
     else info.textContent=scored?'Säsongen: '+pl(wids.length,'vecka','veckor')+' med facit.':(open()?'Poängen visas när facit är inlagt.':'Deadline har gått. Väntar på första matchen.');
