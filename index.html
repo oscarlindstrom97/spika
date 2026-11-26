@@ -110,9 +110,12 @@ section{margin-top:48px}
 .bar3 .s1{background:var(--accent);color:var(--on-accent)}
 .bar3 .sx{background:var(--sand);color:var(--ink)}
 .bar3 .s2{background:var(--ink);color:var(--bg)}
+.desc{margin:14px 0 0;max-width:62ch;white-space:pre-line;overflow-wrap:anywhere;color:var(--text);font-size:15px;line-height:1.6}
+textarea.plain{font:400 16px/1.5 var(--body);min-height:96px}
 .sideh{font:600 15px var(--head);color:var(--ink);margin:24px 0 6px}
 .top3{list-style:none;margin:0;padding:0}
 .top3 li{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}
+.top3 li.empty{display:block;color:var(--muted)}
 .top3 .r{color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
 .top3 .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
 .top3 .p{font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink)}
@@ -330,6 +333,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
           <label>Halvgarderingar<input id="chalf" type="number" min="0" max="13" value="2" inputmode="numeric"></label>
           <label>Helgarderingar<input id="cfull" type="number" min="0" max="13" value="1" inputmode="numeric"></label>
         </div>
+        <label>Beskrivning (valfritt)<textarea class="plain" id="cdesc" maxlength="500" placeholder="Till exempel: Insats 50 kr, vinnaren tar potten. Avgörs efter vecka 52."></textarea></label>
         <p class="cap">Gäller per rad. En halvgardering är två tecken på en match, en helgardering är 1, X och 2. Den bästa raden räknas.</p>
         <div class="inline" style="margin:0"><button class="btn" id="mkcomp" type="button">Skapa tävling</button><span class="status" id="mkmsg" role="status"></span></div>
       </div>
@@ -341,6 +345,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     <section aria-labelledby="kupong">
       <div class="chead"><h2 id="kupong">Kupong</h2><div class="comps" id="comps" role="group" aria-label="Tävlingar"></div></div>
       <div class="rule" id="comprule"></div>
+      <p class="desc" id="compdesc" hidden></p>
       <p class="cap" id="weeklabel" hidden></p>
       <div class="rows" id="rowtabs" role="group" aria-label="Rader"></div>
       <p class="guard" id="guard" role="status"></p>
@@ -600,13 +605,29 @@ details.set[open] summary .ico{transform:rotate(180deg)}
       else{var lv=el('button','Lämna tävlingen','link');lv.type='button';
         sure(lv,'Säker? Dina rader försvinner',function(){sb.from('members').delete().eq('competition_id',C.id).eq('user_id',me).then(function(){pending=GLOBAL;load()})});r.append(lv)}
     }
+    if(C.id===GLOBAL&&isAdmin){var gb=el('button',manageOpen?'Stäng':'Redigera beskrivning','link');gb.type='button';gb.onclick=function(){manageOpen=!manageOpen;renderComps()};r.append(gb)}
+    var dsc=$('compdesc');dsc.textContent=C.description||'';dsc.hidden=!C.description;
     renderManage();
   }
   function renderManage(){
-    var box=$('manage'),ok=C&&C.id!==GLOBAL&&(C.owner_id===me||isAdmin);
+    var box=$('manage'),ok=C&&(C.id===GLOBAL?isAdmin:(C.owner_id===me||isAdmin));
     box.hidden=!(ok&&manageOpen);if(box.hidden)return;
     box.innerHTML='';
     box.append(el('p','Hantera tävlingen','sub-h'));
+    // Beskrivning
+    box.append(el('p','Beskrivning','manage-h'));
+    var ta=document.createElement('textarea');ta.className='plain';ta.maxLength=500;ta.value=C.description||'';ta.setAttribute('aria-label','Beskrivning av tävlingen');
+    ta.placeholder='Till exempel insats, pris eller hur tävlingen avgörs.';
+    var dr2=el('div',null,'inline'),db2=el('button','Spara beskrivning','btn small ghost'),dm2=el('span',null,'status');db2.type='button';
+    db2.onclick=function(){
+      var v=ta.value.trim().slice(0,500)||null;
+      sb.from('competitions').update({description:v}).eq('id',C.id).select().then(function(r){
+        if(r.error||!r.data||!r.data.length){dm2.className='status err';dm2.setAttribute('role','alert');dm2.textContent='Kunde inte spara beskrivningen.';return}
+        C.description=v;renderComps();announce('Beskrivningen är sparad.');
+      });
+    };
+    dr2.append(db2,dm2);box.append(ta,dr2);
+    if(C.id===GLOBAL)return;
     // Namn
     var nr=el('div',null,'inline'),ni=document.createElement('input');ni.maxLength=40;ni.value=C.name;ni.setAttribute('aria-label','Tävlingens namn');
     var nb=el('button','Spara namn','btn small ghost');nb.type='button';var nm=el('span',null,'status');
@@ -668,9 +689,9 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     var id=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():null;
     if(!id){say('mkmsg','Webbläsaren stöder inte att skapa tävling.','err');return}
     say('mkmsg','Skapar…');
-    sb.from('competitions').insert({id:id,name:name,max_rows:rows,max_half:half,max_full:full}).then(function(r){
+    sb.from('competitions').insert({id:id,name:name,max_rows:rows,max_half:half,max_full:full,description:$('cdesc').value.trim().slice(0,500)||null}).then(function(r){
       if(r.error){say('mkmsg','Kunde inte skapa: '+r.error.message,'err');return}
-      say('mkmsg','Tävlingen är skapad. Dela koden med de som ska vara med.','ok');$('cname').value='';pending=id;load();
+      say('mkmsg','Tävlingen är skapad. Dela koden med de som ska vara med.','ok');$('cname').value='';$('cdesc').value='';pending=id;load();
     });
   };
   $('joincomp').onclick=function(){
@@ -858,7 +879,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
       .sort(function(a,b){return (b.total-a.total)||((b.cur||0)-(a.cur||0))});
     var scored=wids.length>0||anyOut,n=playingCount();
     var t3=$('top3');t3.innerHTML='';
-    if(!rows.length)t3.append(el('li','Ingen har lämnat in än.'));
+    if(!rows.length)t3.append(el('li','Ingen har lämnat in än.','empty'));
     rows.slice(0,3).forEach(function(r,k){var li=el('li');li.append(el('span',scored?String(k+1):'–','r'),el('span',(profiles[r.id]||'Kollega')+(r.id===me?' (du)':''),'n'),el('span',scored?String(r.total)+' p':(r.has?'Inne':'–'),'p'));t3.append(li)});
     var info=$('rankinfo');info.innerHTML='';
     if(n){var t=el('span',null,'live-tag');t.append(el('span',null,'dot'),document.createTextNode('Live. Ställningen uppdateras automatiskt.'));info.append(t)}
