@@ -112,6 +112,12 @@ section{margin-top:48px}
 .bar3 .s2{background:var(--ink);color:var(--bg)}
 .desc{margin:14px 0 0;max-width:62ch;white-space:pre-line;overflow-wrap:anywhere;color:var(--text);font-size:15px;line-height:1.6}
 textarea.plain{font:400 16px/1.5 var(--body);min-height:96px}
+dialog#manage{width:min(560px,calc(100% - 32px));max-height:86vh;overflow:auto;border:1px solid var(--line);border-radius:var(--r);padding:28px;background:var(--bg);color:var(--text);box-shadow:0 24px 64px -20px rgba(20,16,12,.45)}
+dialog#manage::backdrop{background:rgba(31,27,22,.5)}
+.mhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:4px}
+.mhead h2{font-size:22px}
+.xbtn{width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:var(--r);background:transparent;color:var(--ink);cursor:pointer}
+.xbtn:hover{border-color:var(--accent)}
 .sideh{font:600 15px var(--head);color:var(--ink);margin:24px 0 6px}
 .top3{list-style:none;margin:0;padding:0}
 .top3 li{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}
@@ -325,7 +331,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     <div class="layout">
     <div class="maincol">
 
-    <div class="newcomp card" id="manage" hidden></div>
+    <dialog id="manage" aria-labelledby="manageh"></dialog>
     <div class="newcomp card" id="newcomp" hidden>
       <p class="sub-h">Skapa tävling</p>
       <div class="form" style="margin-top:16px">
@@ -625,9 +631,14 @@ details.set[open] summary .ico{transform:rotate(180deg)}
   }
   function renderManage(){
     var box=$('manage'),ok=C&&(C.id===GLOBAL?isAdmin:(C.owner_id===me||isAdmin));
-    box.hidden=!(ok&&manageOpen);if(box.hidden)return;
+    if(!box.onclose)box.onclose=function(){if(manageOpen){manageOpen=false;renderComps()}};
+    if(!(ok&&manageOpen)){if(box.open)box.close();return}
     box.innerHTML='';
-    box.append(el('p','Hantera tävlingen','sub-h'));
+    var mh=el('div',null,'mhead'),h2=el('h2','Hantera '+C.name);h2.id='manageh';
+    var xb=el('button',null,'xbtn');xb.type='button';xb.setAttribute('aria-label','Stäng');xb.append(icon('M6 6l12 12M18 6L6 18'));
+    xb.onclick=function(){manageOpen=false;box.close();renderComps()};
+    mh.append(h2,xb);box.append(mh);
+    if(!box.open){try{box.showModal()}catch(e){box.setAttribute('open','')}}
     // Beskrivning
     box.append(el('p','Beskrivning','manage-h'));
     var ta=document.createElement('textarea');ta.className='plain';ta.maxLength=500;ta.value=C.description||'';ta.setAttribute('aria-label','Beskrivning av tävlingen');
@@ -655,6 +666,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     };
     wr.append(wi,wb,wm);box.append(wr);
     // Namn
+    box.append(el('p','Namn','manage-h'));
     var nr=el('div',null,'inline'),ni=document.createElement('input');ni.maxLength=40;ni.value=C.name;ni.setAttribute('aria-label','Tävlingens namn');
     var nb=el('button','Spara namn','btn small ghost');nb.type='button';var nm=el('span',null,'status');
     nb.onclick=function(){
@@ -911,7 +923,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     var scored=wids.length>0||anyOut,n=playingCount();
     var t3=$('top3');t3.innerHTML='';
     if(!rows.length)t3.append(el('li','Ingen har lämnat in än.','empty'));
-    rows.slice(0,3).forEach(function(r,k){var li=el('li');li.append(el('span',scored?String(k+1):'–','r'),el('span',(profiles[r.id]||'Kollega')+(r.id===me?' (du)':''),'n'),el('span',scored?String(r.total)+' p':(r.has?'Inne':'–'),'p'));t3.append(li)});
+    rows.slice(0,3).forEach(function(r,k){var li=el('li');li.append(el('span',scored?String(k+1):'–','r'),el('span',(profiles[r.id]||'Kollega')+(r.id===me?' (du)':''),'n'),el('span',scored?String(r.total)+' p':(r.has?'Inlämnad':'–'),'p'));t3.append(li)});
     var info=$('rankinfo');info.innerHTML='';
     if(n){var t=el('span',null,'live-tag');t.append(el('span',null,'dot'),document.createTextNode('Live. Ställningen uppdateras automatiskt.'));info.append(t)}
     else info.textContent=scored?'Säsongen: '+pl(wids.length,'vecka','veckor')+' med facit.':(open()?'Poängen visas när facit är inlagt.':'Deadline har gått. Väntar på första matchen.');
@@ -919,7 +931,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     rows.forEach(function(r,i){
       var tr=document.createElement('tr');tr.className=(scored&&i===0?'first ':'')+(r.id===me?'me':'');
       tr.append(el('td',scored?String(i+1):'','r'),el('td',(profiles[r.id]||'Kollega')+(r.id===me?' (du)':''),'name'),
-        (function(){var v=anyOut||wids.indexOf(W.id)>-1?(r.cur!=null?r.cur+' / '+W.matches.length:'–'):(r.has?'Inne':'–');return el('td',v,'n'+(/\d/.test(v)?'':' txt'))})(),
+        (function(){var v=anyOut||wids.indexOf(W.id)>-1?(r.cur!=null?r.cur+' / '+W.matches.length:'–'):(r.has?'Inlämnad':'–');return el('td',v,'n'+(/\d/.test(v)?'':' txt'))})(),
         (function(){var cnt=Object.keys(r.weeks).filter(function(k){return k!==W.id}).length+((anyOut||wids.indexOf(W.id)>-1)&&r.has?1:0);
           var v=scored&&cnt?(r.total/cnt).toLocaleString('sv-SE',{minimumFractionDigits:1,maximumFractionDigits:1}):'–';return el('td',v,'n'+(/\d/.test(v)?' avg':' txt'))})(),
         el('td',scored?String(r.total):'–','n'+(scored?'':' txt')));
