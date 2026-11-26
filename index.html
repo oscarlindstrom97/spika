@@ -341,7 +341,8 @@ details.set[open] summary .ico{transform:rotate(180deg)}
           <label>Halvgarderingar<input id="chalf" type="number" min="0" max="13" value="2" inputmode="numeric"></label>
           <label>Helgarderingar<input id="cfull" type="number" min="0" max="13" value="1" inputmode="numeric"></label>
         </div>
-        <label>Antal veckor<input id="cweeks" type="number" min="1" max="52" inputmode="numeric" placeholder="Tom = tills vidare"></label>
+        <label>Antal veckor<input id="cweeks" type="number" min="1" max="52" inputmode="numeric" placeholder="Tom = tills vidare" aria-describedby="cweekshelp"></label>
+        <p class="cap" id="cweekshelp" style="margin-top:-8px">Välj hur många veckor tävlingen ska pågå. Lämna fältet tomt så fortsätter den tills vidare.</p>
         <label>Beskrivning (valfritt)<textarea class="plain" id="cdesc" maxlength="500" placeholder="Till exempel: Insats 50 kr, vinnaren tar potten. Avgörs efter vecka 52."></textarea></label>
         <p class="cap">Gäller per rad. En halvgardering är två tecken på en match, en helgardering är 1, X och 2. Den bästa raden räknas.</p>
         <div class="inline" style="margin:0"><button class="btn" id="mkcomp" type="button">Skapa tävling</button><span class="status" id="mkmsg" role="status"></span></div>
@@ -665,6 +666,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
       });
     };
     wr.append(wi,wb,wm);box.append(wr);
+    var wh=el('p','Välj hur många veckor tävlingen ska pågå. Lämna fältet tomt så fortsätter den tills vidare.','cap');wh.style.marginTop='8px';wh.id='mweekshelp';wi.setAttribute('aria-describedby','mweekshelp');box.append(wh);
     // Namn
     box.append(el('p','Namn','manage-h'));
     var nr=el('div',null,'inline'),ni=document.createElement('input');ni.maxLength=40;ni.value=C.name;ni.setAttribute('aria-label','Tävlingens namn');
@@ -912,6 +914,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     var wids=[],short={};board.forEach(function(r){if(wids.indexOf(r.week_id)<0){wids.push(r.week_id);short[r.week_id]=r.short}});wids.sort();
     var users={};
     function U(id){return users[id]=users[id]||{id:id,base:0,cur:null,has:false,weeks:{}}}
+    membersAll.forEach(function(m){if(m.competition_id===C.id)U(m.user_id)});
     P.forEach(function(p){var u=U(p.user_id);if(p.week_id===W.id)u.has=true});
     board.forEach(function(r){var u=users[r.user_id];if(!u)return;u.weeks[r.week_id]=r.score;if(r.week_id===W.id)u.cur=r.score;else u.base+=r.score});
     // Pågående och spelade matcher räknas direkt. Bästa raden gäller.
@@ -923,7 +926,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     var scored=wids.length>0||anyOut,n=playingCount();
     var t3=$('top3');t3.innerHTML='';
     if(!rows.length)t3.append(el('li','Ingen har lämnat in än.','empty'));
-    rows.slice(0,3).forEach(function(r,k){var li=el('li');li.append(el('span',scored?String(k+1):'–','r'),el('span',(profiles[r.id]||'Kollega')+(r.id===me?' (du)':''),'n'),el('span',scored?String(r.total)+' p':(r.has?'Inlämnad':'–'),'p'));t3.append(li)});
+    rows.slice(0,3).forEach(function(r,k){var li=el('li');li.append(el('span',scored?String(k+1):'–','r'),el('span',(profiles[r.id]||'Kollega')+(r.id===me?' (du)':''),'n'),el('span',scored?String(r.total)+' p':(r.has?'Inlämnad':(open()?'Tänker…':'–')),'p'));t3.append(li)});
     var info=$('rankinfo');info.innerHTML='';
     if(n){var t=el('span',null,'live-tag');t.append(el('span',null,'dot'),document.createTextNode('Live. Ställningen uppdateras automatiskt.'));info.append(t)}
     else info.textContent=scored?'Säsongen: '+pl(wids.length,'vecka','veckor')+' med facit.':(open()?'Poängen visas när facit är inlagt.':'Deadline har gått. Väntar på första matchen.');
@@ -931,7 +934,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     rows.forEach(function(r,i){
       var tr=document.createElement('tr');tr.className=(scored&&i===0?'first ':'')+(r.id===me?'me':'');
       tr.append(el('td',scored?String(i+1):'','r'),el('td',(profiles[r.id]||'Kollega')+(r.id===me?' (du)':''),'name'),
-        (function(){var v=anyOut||wids.indexOf(W.id)>-1?(r.cur!=null?r.cur+' / '+W.matches.length:'–'):(r.has?'Inlämnad':'–');return el('td',v,'n'+(/\d/.test(v)?'':' txt'))})(),
+        (function(){var v=anyOut||wids.indexOf(W.id)>-1?(r.cur!=null?r.cur+' / '+W.matches.length:'–'):(r.has?'Inlämnad':(open()?'Tänker…':'–'));return el('td',v,'n'+(/\d/.test(v)?'':' txt'))})(),
         (function(){var cnt=Object.keys(r.weeks).filter(function(k){return k!==W.id}).length+((anyOut||wids.indexOf(W.id)>-1)&&r.has?1:0);
           var v=scored&&cnt?(r.total/cnt).toLocaleString('sv-SE',{minimumFractionDigits:1,maximumFractionDigits:1}):'–';return el('td',v,'n'+(/\d/.test(v)?' avg':' txt'))})(),
         el('td',scored?String(r.total):'–','n'+(scored?'':' txt')));
