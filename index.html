@@ -40,8 +40,8 @@ button{font:inherit;color:inherit}
 .top .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
 .mark{display:flex;align-items:center;color:var(--on-band);text-decoration:none}
 .logo{height:30px;width:auto;display:block}
-.me{display:flex;align-items:center;gap:16px;font-size:14px;color:var(--on-band);min-width:0}
-.me span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:38vw}
+.hdr .me{display:flex;align-items:center;gap:16px;font-size:14px;color:var(--on-band);min-width:0}
+.hdr .me span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:38vw}
 .tbtn{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--greige);border-radius:var(--r);background:transparent;color:var(--ink);cursor:pointer}
 .tbtn:hover{border-color:var(--accent)}
 .tbtn .moon{display:none}
@@ -186,6 +186,7 @@ th{font:500 13px var(--body);color:var(--muted);border-bottom:1px solid var(--in
 td.n,th.n{text-align:right;padding-right:0;padding-left:16px}
 td.n{font-size:19px}
 tr.first td.n{font-size:26px}
+td.n.txt,tr.first td.n.txt{font-size:15px;font-weight:500;color:var(--muted)}
 td.r{width:44px;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
 td.name{white-space:normal;overflow-wrap:anywhere;color:var(--ink)}
 tr.first td{font-weight:600;color:var(--ink)}
@@ -254,7 +255,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
 .rules{margin:72px 0 0;padding:0;list-style:none;color:var(--muted);font-size:14px;display:grid;gap:8px;border-top:1px solid var(--line);padding-top:24px}
 @media (max-width:560px){.match{grid-template-columns:28px minmax(0,1fr)}.match .opts{grid-column:2/-1}.opt{width:56px;height:44px}.folk .p span{width:56px}.bar3{width:180px}.folk{grid-template-columns:auto minmax(0,1fr)}.folk .p{order:-1}.folk>span:first-child{display:none}.distnote{display:block}}
 @media (max-width:420px){.opts{gap:6px}.folk .p{gap:6px}.go{padding:14px 20px}}
-@media (max-width:420px){.me span{display:none}}
+@media (max-width:420px){.hdr .me span{display:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -888,7 +889,7 @@ details.set[open] summary .ico{transform:rotate(180deg)}
     rows.forEach(function(r,i){
       var tr=document.createElement('tr');tr.className=(scored&&i===0?'first ':'')+(r.id===me?'me':'');
       tr.append(el('td',scored?String(i+1):'','r'),el('td',(profiles[r.id]||'Kollega')+(r.id===me?' (du)':''),'name'),
-        el('td',anyOut||wids.indexOf(W.id)>-1?(r.cur!=null?r.cur+' / '+W.matches.length:'–'):(r.has?'Inne':'–'),'n'),
+        (function(){var v=anyOut||wids.indexOf(W.id)>-1?(r.cur!=null?r.cur+' / '+W.matches.length:'–'):(r.has?'Inne':'–');return el('td',v,'n'+(/\d/.test(v)?'':' txt'))})(),
         el('td',scored?String(r.total):'–','n'));
       tb.append(tr);
     });
